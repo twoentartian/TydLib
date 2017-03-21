@@ -77,22 +77,27 @@ namespace UdpManagerNamespace
 
 			//Add listen thread
 			TimerCallback tempTimerCallback = Listen;
-			ThreadManager.GetInstance().AddThread(tempTimerCallback, null, 0, 100);
+			ThreadManager.GetInstance().AddThread(tempTimerCallback, null, 0, 500);
 
 			Print("Start listening");
 		}
 
+		private static bool _listenFuncSign = false;
+
 		private void Listen(object state)
 		{
-			while (true)
+			if (_listenFuncSign == false)
 			{
-				IPEndPoint remotEndPoint = new IPEndPoint(IPAddress.Any, 0);
-				byte[] data = _hostUdpClient.Receive(ref remotEndPoint);
+				_listenFuncSign = true;
+				while (true)
+				{
+					IPEndPoint remotEndPoint = new IPEndPoint(IPAddress.Any, 0);
+					byte[] data = _hostUdpClient.Receive(ref remotEndPoint);
 
-
-				Print(remotEndPoint.Address.ToString() + ": " + Encoding.ASCII.GetString(data));
-
-
+					//TODO: add code for listening
+					Print(remotEndPoint.Address.ToString() + ": " + Encoding.ASCII.GetString(data));
+				}
+				_listenFuncSign = false;
 			}
 		}
 
