@@ -16,6 +16,16 @@ namespace UdpManagerNamespace
 		public override string Message { get; }
 	}
 
+	class MultiIpV4AddressException : ApplicationException
+	{
+		public MultiIpV4AddressException(string message)
+		{
+			Message = message;
+		}
+
+		public override string Message { get; }
+	}
+
 	class UdpManagerNotInitializeException : ApplicationException
 	{
 		public UdpManagerNotInitializeException(string message)

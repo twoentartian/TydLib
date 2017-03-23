@@ -59,18 +59,21 @@ namespace UdpManagerNamespace
 
 			_hostName = Dns.GetHostName();
 			IPAddress[] allAddresses = Dns.GetHostAddresses(_hostName);
-			foreach (var address in allAddresses)
+			IEnumerable<IPAddress> ipV4AddressList = from singleAddresses in allAddresses where (singleAddresses.AddressFamily == AddressFamily.InterNetwork) select singleAddresses;
+			IPAddress[] ipV4AddressArray = ipV4AddressList.ToArray();
+			if (ipV4AddressArray.Length == 0)
 			{
-				if (address.AddressFamily == AddressFamily.InterNetwork)
-				{
-					_hostIpAddress = address;
-					break;
-				}
+				throw new NoVaildIpV4AddressException("No Vaild InterNetwork V4 Address");
 			}
-			if (_hostIpAddress == null)
+			else if (ipV4AddressArray.Length == 1)
 			{
-				throw new NoVaildIpV4AddressException("Could not find any vaild IPv4 address");
+				_hostIpAddress = ipV4AddressArray[0];
 			}
+			else
+			{
+				throw new MultiIpV4AddressException("More Than One Vaild InterNetwork V4 Address");
+			}
+
 			_hostIpEndPoint = new IPEndPoint(_hostIpAddress, argPort);
 			_hostUdpClient = new UdpClient(_hostIpEndPoint);
 
