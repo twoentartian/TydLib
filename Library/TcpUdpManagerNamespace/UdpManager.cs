@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -17,7 +18,7 @@ namespace TcpUdpManagerNamespace
 
 		private UdpManager()
 		{
-			
+			InitHost();
 		}
 
 		public static UdpManager GetInstance()
@@ -26,11 +27,6 @@ namespace TcpUdpManagerNamespace
 		}
 
 		#endregion
-
-		private void Print(string info)
-		{
-			Console.WriteLine("UDP Manager: " + info);
-		}
 
 		#region Property
 
@@ -46,9 +42,12 @@ namespace TcpUdpManagerNamespace
 		private UdpClient _hostUdpClient;
 		public UdpClient HostUdpClient => _hostUdpClient;
 
+		private ListenTaskDelegate _receiveDelegate;
+		public ListenTaskDelegate ReceiveDelegate => _receiveDelegate;
+
 		#endregion
 
-		public void Init(int argPort)
+		public void InitHost()
 		{
 			_hostName = null;
 			_hostIpAddress = null;
@@ -71,17 +70,38 @@ namespace TcpUdpManagerNamespace
 			{
 				throw new MultiIpV4AddressException("More Than One Vaild InterNetwork V4 Address");
 			}
+		}
+
+		/// <summary>
+		/// Init local UDP socket
+		/// </summary>
+		/// <param name="argPort"></param>
+		/// <param name="argListenTask"></param>
+		public void InitUdp(int argPort, ListenTaskDelegate argListenTask)
+		{
+			if (_hostName == null|| _hostIpAddress == null)
+			{
+				InitHost();
+			}
 
 			_hostIpEndPoint = new IPEndPoint(_hostIpAddress, argPort);
 			_hostUdpClient = new UdpClient(_hostIpEndPoint);
+			_receiveDelegate = argListenTask;
 
 			//Add listen thread
 			Thread listenThread = new Thread(Listen) {IsBackground = true};
 			listenThread.Start();
-
-			Print("Start listening");
 		}
 
+		/// <summary>
+		/// Occurs when receive data from UDP socket.
+		/// </summary>
+		/// <param name="data"></param>
+		public delegate void ListenTaskDelegate(byte[] data);
+
+		/// <summary>
+		/// Listen thread func
+		/// </summary>
 		private void Listen()
 		{
 			while (true)
@@ -90,10 +110,23 @@ namespace TcpUdpManagerNamespace
 				byte[] data = _hostUdpClient.Receive(ref remotEndPoint);
 
 				//TODO: add code for listening
-				Print(remotEndPoint.Address + ": " + Encoding.ASCII.GetString(data));
+				try
+				{
+					_receiveDelegate(data);
+				}
+				catch (NullReferenceException e)
+				{
+					Console.WriteLine(e);
+				}
 			}
 		}
 
+		/// <summary>
+		/// Send message through a UDP socket.
+		/// </summary>
+		/// <param name="remoteIpAddress"></param>
+		/// <param name="port"></param>
+		/// <param name="message"></param>
 		public void Send(IPAddress remoteIpAddress, int port, string message)
 		{
 			if (_hostName == null || _hostIpAddress == null || _hostIpEndPoint == null || _hostUdpClient ==null)

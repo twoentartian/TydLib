@@ -21,7 +21,7 @@ namespace TcpUdpManagerNamespace
 
 		private TcpManager()
 		{
-
+			InitHost();
 		}
 
 		public static TcpManager GetInstance()
@@ -37,6 +37,8 @@ namespace TcpUdpManagerNamespace
 		}
 
 		#region Property
+
+		public delegate void ListenDelegate(byte[] argBytes);
 
 		private string _hostName;
 		public string HostName => _hostName;
@@ -56,8 +58,14 @@ namespace TcpUdpManagerNamespace
 		private TcpClient _hostTcpClient;
 		public TcpClient HostTcpClient => _hostTcpClient;
 
+		private ListenDelegate _tcpServerReceiveDelegate;
+		public ListenDelegate TcpServerReceiveDelegate => _tcpServerReceiveDelegate;
+
+		private ListenDelegate _tcpClientReceiveDelegate;
+		public ListenDelegate TcpClientReceiveDelegate => _tcpClientReceiveDelegate;
+
 		#endregion
-		
+
 		/// <summary>
 		/// Acquire local network information.
 		/// </summary>
@@ -120,7 +128,8 @@ namespace TcpUdpManagerNamespace
 		/// Init TCP server, start listen task on argPort at the same time.
 		/// </summary>
 		/// <param name="argPort"></param>
-		public void InitTcpServer(int argPort)
+		/// <param name="argListenDelegate"></param>
+		public void InitTcpServer(int argPort, ListenDelegate argListenDelegate)
 		{
 			if (_hostName == null || _hostIpAddress == null)
 			{
@@ -130,14 +139,16 @@ namespace TcpUdpManagerNamespace
 			_hostTcpServer = null;
 			_hostServerEndPoint = new IPEndPoint(_hostIpAddress, argPort);
 			_hostTcpServer = new TcpListener(_hostServerEndPoint);
+			_tcpServerReceiveDelegate = argListenDelegate;
 
 			_hostTcpServer.Start(MaxClient);
+			TcpServerStartListenTask();
 		}
 
 		/// <summary>
 		/// Start listen service on server
 		/// </summary>
-		public void TcpServerStartListenTask()
+		private void TcpServerStartListenTask()
 		{
 			Thread listenThread = new Thread(ListenClientConnect);
 			listenThread.IsBackground = true;
@@ -222,8 +233,11 @@ namespace TcpUdpManagerNamespace
 					sr.Dispose();
 					tcpClientWithGuid.Stop();
 				}
-				//TODO: Write the message execute code
-				Console.WriteLine(result);
+				else
+				{
+					//TODO: Write the message execute code
+					_tcpServerReceiveDelegate(Encoding.ASCII.GetBytes(result));
+				}
 			}
 		}
 
@@ -438,8 +452,6 @@ namespace TcpUdpManagerNamespace
 			return GetRemoteTcpClient(argAddress).Guid;
 		}
 
-
-
 		#endregion
 
 		#region TcpClient
@@ -448,8 +460,9 @@ namespace TcpUdpManagerNamespace
 		/// Init TCP client and connect to a server, occupy a port at the same time.
 		/// </summary>
 		/// <param name="argRemoteIpEndPoint"></param>
+		/// <param name="argListenDelegate"></param>
 		/// <param name="argPort"></param>
-		public void InitTcpClient(IPEndPoint argRemoteIpEndPoint, int argPort)
+		public void InitTcpClient(IPEndPoint argRemoteIpEndPoint, ListenDelegate argListenDelegate, int argPort)
 		{
 			if (_hostName == null || _hostIpAddress == null)
 			{
@@ -457,12 +470,12 @@ namespace TcpUdpManagerNamespace
 			}
 			_hostClientEndPoint = null;
 			_hostClientEndPoint = new IPEndPoint(_hostIpAddress, argPort);
-
 			_hostTcpClient = null;
 			_hostTcpClient = new TcpClient(_hostClientEndPoint);
 
 			_hostTcpClient.Connect(argRemoteIpEndPoint);
 
+			_tcpClientReceiveDelegate = argListenDelegate;
 			TcpClientStartListenTask();
 		}
 
@@ -470,7 +483,8 @@ namespace TcpUdpManagerNamespace
 		/// Init TCP client, this method use a random port.
 		/// </summary>
 		/// <param name="argRemoteIpEndPoint"></param>
-		public void InitTcpClient(IPEndPoint argRemoteIpEndPoint)
+		/// <param name="argListenDelegate"></param>
+		public void InitTcpClient(IPEndPoint argRemoteIpEndPoint, ListenDelegate argListenDelegate)
 		{
 			Random randomGenerator = new Random();
 			while (true)
@@ -478,7 +492,7 @@ namespace TcpUdpManagerNamespace
 				int port = randomGenerator.Next(10000, 65535);
 				try
 				{
-					InitTcpClient(argRemoteIpEndPoint, port);
+					InitTcpClient(argRemoteIpEndPoint, argListenDelegate, port);
 					break;
 				}
 				catch (SocketException e)
@@ -524,8 +538,7 @@ namespace TcpUdpManagerNamespace
 				}
 
 				//TODO: Add delegate
-				Console.WriteLine(message);
-
+				_tcpClientReceiveDelegate(Encoding.ASCII.GetBytes(message));
 			}
 			ns.Dispose();
 		}
