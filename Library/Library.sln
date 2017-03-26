@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpUdpManagerNamespace", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimerManagerNamespace", "TimerManagerNamespace\TimerManagerNamespace.csproj", "{04FE54F2-1E9B-4A7F-8A10-D908FD72C895}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialPortNamespace", "SerialPortNamespace\SerialPortNamespace.csproj", "{AB2B43DD-B6CC-489C-AC34-1C0BB7BE7077}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{04FE54F2-1E9B-4A7F-8A10-D908FD72C895}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04FE54F2-1E9B-4A7F-8A10-D908FD72C895}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04FE54F2-1E9B-4A7F-8A10-D908FD72C895}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB2B43DD-B6CC-489C-AC34-1C0BB7BE7077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB2B43DD-B6CC-489C-AC34-1C0BB7BE7077}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB2B43DD-B6CC-489C-AC34-1C0BB7BE7077}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB2B43DD-B6CC-489C-AC34-1C0BB7BE7077}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
