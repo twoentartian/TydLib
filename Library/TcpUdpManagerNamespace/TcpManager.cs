@@ -38,7 +38,7 @@ namespace TcpUdpManagerNamespace
 
 		#region Property
 
-		public delegate void ListenDelegate(byte[] argBytes);
+		public delegate void ListenTaskDelegate(byte[] argBytes);
 
 		private string _hostName;
 		public string HostName => _hostName;
@@ -58,11 +58,11 @@ namespace TcpUdpManagerNamespace
 		private TcpClient _hostTcpClient;
 		public TcpClient HostTcpClient => _hostTcpClient;
 
-		private ListenDelegate _tcpServerReceiveDelegate;
-		public ListenDelegate TcpServerReceiveDelegate => _tcpServerReceiveDelegate;
+		private ListenTaskDelegate _tcpServerReceiveDelegate;
+		public ListenTaskDelegate TcpServerReceiveDelegate => _tcpServerReceiveDelegate;
 
-		private ListenDelegate _tcpClientReceiveDelegate;
-		public ListenDelegate TcpClientReceiveDelegate => _tcpClientReceiveDelegate;
+		private ListenTaskDelegate _tcpClientReceiveDelegate;
+		public ListenTaskDelegate TcpClientReceiveDelegate => _tcpClientReceiveDelegate;
 
 		#endregion
 
@@ -129,7 +129,7 @@ namespace TcpUdpManagerNamespace
 		/// </summary>
 		/// <param name="argPort"></param>
 		/// <param name="argListenDelegate"></param>
-		public void InitTcpServer(int argPort, ListenDelegate argListenDelegate)
+		public void InitTcpServer(int argPort, ListenTaskDelegate argListenDelegate)
 		{
 			if (_hostName == null || _hostIpAddress == null)
 			{
@@ -462,7 +462,7 @@ namespace TcpUdpManagerNamespace
 		/// <param name="argRemoteIpEndPoint"></param>
 		/// <param name="argListenDelegate"></param>
 		/// <param name="argPort"></param>
-		public void InitTcpClient(IPEndPoint argRemoteIpEndPoint, ListenDelegate argListenDelegate, int argPort)
+		public void InitTcpClient(IPEndPoint argRemoteIpEndPoint, ListenTaskDelegate argListenDelegate, int argPort)
 		{
 			if (_hostName == null || _hostIpAddress == null)
 			{
@@ -484,7 +484,7 @@ namespace TcpUdpManagerNamespace
 		/// </summary>
 		/// <param name="argRemoteIpEndPoint"></param>
 		/// <param name="argListenDelegate"></param>
-		public void InitTcpClient(IPEndPoint argRemoteIpEndPoint, ListenDelegate argListenDelegate)
+		public void InitTcpClient(IPEndPoint argRemoteIpEndPoint, ListenTaskDelegate argListenDelegate)
 		{
 			Random randomGenerator = new Random();
 			while (true)
