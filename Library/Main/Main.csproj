@@ -49,6 +49,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SerialPortNamespace\SerialPortNamespace.csproj">
+      <Project>{ab2b43dd-b6cc-489c-ac34-1c0bb7be7077}</Project>
+      <Name>SerialPortNamespace</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TcpUdpManagerNamespace\TcpUdpManagerNamespace.csproj">
       <Project>{9844fa7e-b1df-4c52-8729-8d58b4e8dbc2}</Project>
       <Name>TcpUdpManagerNamespace</Name>
