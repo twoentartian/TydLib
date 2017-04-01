@@ -38,7 +38,11 @@ namespace TcpUdpManagerNamespace
 
 		#region Property
 
-		public delegate void ListenTaskDelegate(byte[] argBytes);
+		/// <summary>
+		/// It must be a loop to make sure it receives message all the time.
+		/// </summary>
+		/// <param name="argClient"></param>
+		public delegate void ListenTaskDelegate(object argClient);
 
 		private string _hostName;
 		public string HostName => _hostName;
@@ -223,22 +227,7 @@ namespace TcpUdpManagerNamespace
 		/// <param name="argClientWithGuid"></param>  
 		private void TcpServerReceiveMessage(object argClientWithGuid)
 		{
-			TcpClientWithGuid tcpClientWithGuid = (TcpClientWithGuid)argClientWithGuid;
-			StreamReader sr = new StreamReader(tcpClientWithGuid.TcpStream);
-			while (true)
-			{
-				string result = sr.ReadLine();
-				if (result == null)
-				{
-					sr.Dispose();
-					tcpClientWithGuid.Stop();
-				}
-				else
-				{
-					//TODO: Write the message execute code
-					_tcpServerReceiveDelegate(Encoding.ASCII.GetBytes(result));
-				}
-			}
+			_tcpServerReceiveDelegate(argClientWithGuid);
 		}
 
 		/// <summary>
@@ -519,28 +508,7 @@ namespace TcpUdpManagerNamespace
 		/// </summary>
 		private void TcpClientReceiveMessage()
 		{
-			NetworkStream ns = new NetworkStream(_hostTcpClient.Client);
-			StreamReader sr = new StreamReader(ns);
-			while (true)
-			{
-				string message;
-				try
-				{
-					message = sr.ReadLine();
-				}
-				catch (Exception)
-				{
-					break;
-				}
-				if (message == null)
-				{
-					break;
-				}
-
-				//TODO: Add delegate
-				_tcpClientReceiveDelegate(Encoding.ASCII.GetBytes(message));
-			}
-			ns.Dispose();
+			_tcpClientReceiveDelegate(HostTcpClient);
 		}
 
 		/// <summary>

@@ -188,21 +188,41 @@ namespace SerialPortNamespace
 		/// <summary>
 		/// Send data according to port name
 		/// </summary>
-		/// <param name="argportName"></param>
+		/// <param name="argPortName"></param>
 		/// <param name="argBytes"></param>
-		public void Send(string argportName, byte[] argBytes)
+		public void Send(string argPortName, byte[] argBytes)
 		{
-			GetPort(argportName).Send(argBytes);
+			GetPort(argPortName).Send(argBytes);
 		}
 
 		/// <summary>
 		/// Send data according to port name
 		/// </summary>
-		/// <param name="argportName"></param>
+		/// <param name="argPortName"></param>
 		/// <param name="argString"></param>
-		public void Send(string argportName, string argString)
+		public void Send(string argPortName, string argString)
 		{
-			GetPort(argportName).Send(argString);
+			GetPort(argPortName).Send(argString);
+		}
+
+		/// <summary>
+		/// Read data in the buffer according to its GUID
+		/// </summary>
+		/// <param name="argGuid"></param>
+		/// <returns></returns>
+		public byte[] Read(Guid argGuid)
+		{
+			return GetPort(argGuid).Read();
+		}
+
+		/// <summary>
+		/// Read data in the buffer according to its name.
+		/// </summary>
+		/// <param name="argPortName"></param>
+		/// <returns></returns>
+		public byte[] Read(string argPortName)
+		{
+			return GetPort(argPortName).Read();
 		}
 
 		/// <summary>
